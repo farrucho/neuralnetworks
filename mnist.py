@@ -37,14 +37,26 @@ net.use_loss_function(mse, mse_derivative)
 
 net.read()
 
-net.fit(x_train, y_train, 3, 0.1)
+#net.fit(x_train, y_train, 30, 0.1)
+#net.fit(x_test, y_test, 10, 0.1)
+#net.save()
 
-# test on 3 samples
-out = net.predict(x_train[0:3])
+""" k=0
+for j in range(len(x_test)):
+    out = net.predict(x_test[j])
+    if np.argmax(out) != np.argmax(y_test[j]):
+        print(f"index: {j}, resultado: {out}, suposto: {y_test[j]}")
+        k += 1
+print("accuracy: " + str(100-100*k/len(x_test)) + "%") """
+
+""" # test on 3 samples
+out = net.predict(x_test[570:573])
 print("\n")
 print("predicted values : ")
 print(out, end="\n")
 print("true values : ")
-print(y_train[0:3])
+print(y_test[570:573]) """
 
-net.save()
+#PROXIMO FAZER FAZER QUICKDRAW
+# DAR CONTROL C NOS ERROS E EPOCHS PARA FAZER GRAFICO E COMPARAR PERFORMANCE
+
