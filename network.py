@@ -8,6 +8,12 @@ class FCLayer():
         self.bias = np.random.rand(1, N_outputs) - 0.5
         # assim os valores tao entre -0.5 e 0.5 pos/neg
 
+    def mudar_param(self, weights, bias, input, output):
+        self.weights = weights
+        self.bias = bias
+        self.input = input
+        self.output = output
+
     def forward_propagation(self, input_data): # input data, valor dos nodes da esquerda recebidos
         self.input = input_data
         self.output = np.dot(self.input, self.weights) + self.bias
@@ -28,6 +34,14 @@ class ActivationLayer():
     def __init__(self, activation, activation_derivative):
         self.activation = activation
         self.activation_derivative = activation_derivative
+        self.weights = []
+        self.bias = []
+
+    def mudar_param(self, weights, bias, input, output):
+        self.weights = weights
+        self.bias = bias
+        self.input = input
+        self.output = output
 
     def forward_propagation(self, input_data):
         self.input = input_data
@@ -67,20 +81,52 @@ class Network:
             for j in range(samples): # rodar nas samples
                 # forward propagation
                 output = self.predict(x_lista[j])
-            
-                err += self.loss_derivative(y_lista[j],output)
 
+                err += self.loss(y_lista[j],output)
+                
                 # backpropagation
                 error = self.loss_derivative(y_lista[j],output)
-                
                 for layer in reversed(self.layers):
                     error = layer.backward_propagation(error, learning_rate)
+        
+            err = np.sum(err) / samples * 100
+            print('epoch: ' + str(i+1) + "  error = " + str(err) + "%")
 
-            err /= samples
-            print('epoch: ' + str(i) + "  error = " + str(err) + "%")
+    def save(self):
+        print("salvando dados")
+        f = open("network.txt", "w")
+        f.write("")
+        f.close()
+        f = open("network.txt", "a")
+        for layer in self.layers:
+            f.write(str(np.array(layer.weights).tolist()).replace("\n","") + "\n" + str(np.array(layer.bias).tolist()).replace("\n","") + "\n" + str(np.array(layer.input).tolist()).replace("\n","") + "\n" + str(np.array(layer.output).tolist()).replace("\n","") + "\n")
+        f.close()
+        print("guardado dados")
 
+    def read(self):
+        f = open("network.txt", "r")
+        texto = f.read()
+        f.close()
+        lista_tudo = (texto.replace("None", "[0]")).split("\n")
+        import json
+        for j in range(len(self.layers)):
+            self.layers[j].mudar_param(np.array(json.loads(lista_tudo[j*4])), np.array(json.loads(lista_tudo[j*4+1])), np.array(json.loads(lista_tudo[j*4+2])), np.array(json.loads(lista_tudo[j*4+3])))
+        print("dados lidos")
+            
 
+# activation function and its derivative
+def tanh(x):
+    return np.tanh(x)
 
+def tanh_derivative(x):
+    return 1-np.tanh(x)**2
+
+# loss function and its derivative
+def mse(y_real, y_actual):
+    return (np.power(y_real-y_actual, 2))/y_real.size
+
+def mse_derivative(y_real, y_actual):
+    return 2*(y_actual-y_real)/y_real.size
 
 
 
