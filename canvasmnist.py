@@ -6,7 +6,7 @@ import PIL
 from PIL import Image
 
 # Making canvas
-screen = pygame.display.set_mode((280, 280))
+screen = pygame.display.set_mode((200, 200))
  
 # Setting Title
 pygame.display.set_caption('Canvas')
@@ -16,7 +16,7 @@ draw_on = False
 last_pos = (0, 0)
  
 # Radius of the Brush
-radius = 5
+radius = 3
  
  
 def roundline(canvas, color, start, end, radius=1):
@@ -36,9 +36,12 @@ try:
         if e.type == pygame.QUIT:
             raise StopIteration
              
-        if e.type == pygame.MOUSEBUTTONDOWN:         
-            # Selecting random Color Code
-            color = (255,255,255,0.5)
+        if e.type == pygame.MOUSEBUTTONDOWN:
+            color = (255,255,255)
+            if e.button == 1:
+                color = (255,255,255)
+            else:
+                color = (0,0,0)
             # Draw a single circle wheneven mouse is clicked down.
             pygame.draw.circle(screen, color, e.pos, radius)
             draw_on = True
@@ -57,7 +60,8 @@ try:
     
         size = (28,28)
         img = cv2.imread("canvas.jpeg")
-        img = cv2.resize(img,size,interpolation=cv2.INTER_LINEAR)
+        img = cv2.resize(img,size,interpolation=cv2.INTER_CUBIC)
+        cv2.imwrite("canvas.jpeg", img)
 
         array = np.array(img).astype('float32')/255
 
@@ -68,8 +72,7 @@ try:
         out = np.array(net.predict(array))
         out = out.squeeze().reshape(10,1)
 
-
-        print(f'probabilidades: 0:{round(float(out[0])*100,0)} 1:{round(float(out[1])*100,0)} 2:{round(float(out[2])*100,0)} 3:{round(float(out[3])*100,0)} 4:{round(float(out[4])*100,0)} 5:{round(float(out[5])*100,0)} 6:{round(float(out[6])*100,0)} 7:{round(float(out[7])*100,0)} 8:{round(float(out[8])*100,0)} 9:{round(float(out[9])*100,0)}\n VALOR MAIS PROVAVEL: {np.argmax(out)}, prob: {np.max(out)*100}%')
+        print(f'probabilidades: 0:{round(float(out[0][0]),2)} 1:{round(float(out[1][0]),2)} 2:{round(float(out[2][0]),2)} 3:{round(float(out[3][0]),2)} 4:{round(float(out[4]),2)} 5:{round(float(out[5][0]),2)} 6:{round(float(out[6][0]),2)} 7:{round(float(out[7][0]),2)} 8:{round(float(out[8][0]),2)} 9:{round(float(out[9][0]),2)}\n VALOR MAIS PROVAVEL: {np.argmax(out)}, prob: {np.max(out)*100}%')
 
         pygame.display.flip()
  
